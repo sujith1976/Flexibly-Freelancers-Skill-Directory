@@ -19,14 +19,21 @@ const TagInput: React.FC<TagInputProps> = ({
     setInput(e.target.value);
   };
   
+  // Normalize tag (trim and lowercase)
+  const normalizeTag = (tag: string): string => {
+    return tag.trim().toLowerCase();
+  };
+  
   // Handle key down events to add tags
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && input.trim()) {
       e.preventDefault();
       
-      // Don't add duplicate tags
-      if (!tags.includes(input.trim())) {
-        setTags(prevTags => [...prevTags, input.trim()]);
+      const normalizedInput = normalizeTag(input);
+      
+      // Don't add duplicate tags (case insensitive)
+      if (!tags.map(tag => normalizeTag(tag)).includes(normalizedInput)) {
+        setTags(prevTags => [...prevTags, normalizedInput]);
       }
       
       setInput('');

@@ -15,6 +15,7 @@ const SearchFreelancers: React.FC = () => {
   const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [debugInfo, setDebugInfo] = useState('');
 
   // Search for freelancers whenever searchSkills changes
   useEffect(() => {
@@ -30,9 +31,17 @@ const SearchFreelancers: React.FC = () => {
     try {
       setIsLoading(true);
       setError('');
+      setDebugInfo('Fetching all freelancers...');
       
       const data = await apiRequest<Freelancer[]>(ENDPOINTS.freelancers);
       setFreelancers(data);
+      setDebugInfo(`Found ${data.length} total freelancers`);
+      
+      // Log all freelancers' skills for debugging
+      if (data.length > 0) {
+        const skillsLog = data.map(f => `${f.name}: [${f.skills.join(', ')}]`).join('\n');
+        setDebugInfo(prev => `${prev}\n\nFreelancers skills:\n${skillsLog}`);
+      }
     } catch (error) {
       console.error('Error fetching freelancers:', error);
       setError(error instanceof Error ? error.message : 'An error occurred while fetching freelancers');
@@ -47,9 +56,47 @@ const SearchFreelancers: React.FC = () => {
       setIsLoading(true);
       setError('');
       
-      const skillsQuery = searchSkills.join(',');
-      const data = await apiRequest<Freelancer[]>(`${ENDPOINTS.freelancerSearch}?skills=${skillsQuery}`);
-      setFreelancers(data);
+      // Normalize skills before sending
+      const normalizedSkills = searchSkills.map(skill => skill.trim().toLowerCase());
+      
+      // For one skill, just use a simple parameter
+      if (normalizedSkills.length === 1) {
+        const searchTerm = normalizedSkills[0];
+        setDebugInfo(`Searching for freelancers with skill: ${searchTerm}`);
+        
+        const data = await apiRequest<Freelancer[]>(
+          `${ENDPOINTS.freelancerSearch}?skills=${encodeURIComponent(searchTerm)}`
+        );
+        
+        setFreelancers(data);
+        setDebugInfo(prev => `${prev}\n\nFound ${data.length} matching freelancers`);
+      } 
+      // For multiple skills, use a manual client-side approach
+      else {
+        setDebugInfo(`Fetching all freelancers to filter by skills: ${normalizedSkills.join(', ')}`);
+        
+        // Get all freelancers
+        const allFreelancers = await apiRequest<Freelancer[]>(ENDPOINTS.freelancers);
+        
+        // Filter freelancers that have ALL the required skills
+        const matchingFreelancers = allFreelancers.filter(freelancer => 
+          normalizedSkills.every(searchSkill => 
+            freelancer.skills.some(freelancerSkill => 
+              freelancerSkill.toLowerCase() === searchSkill.toLowerCase()
+            )
+          )
+        );
+        
+        setFreelancers(matchingFreelancers);
+        setDebugInfo(prev => `${prev}\n\nFound ${matchingFreelancers.length} freelancers with ALL skills`);
+      }
+      
+      // Show matched freelancers and their skills
+      if (freelancers.length > 0) {
+        const skillsLog = freelancers.map(f => `${f.name}: [${f.skills.join(', ')}]`).join('\n');
+        setDebugInfo(prev => `${prev}\n\nMatching freelancers:\n${skillsLog}`);
+      }
+      
     } catch (error) {
       console.error('Error searching freelancers:', error);
       setError(error instanceof Error ? error.message : 'An error occurred while searching freelancers');
@@ -78,6 +125,12 @@ const SearchFreelancers: React.FC = () => {
       {error && (
         <div className="p-4 mb-4 bg-red-100 text-red-800 rounded">
           {error}
+        </div>
+      )}
+      
+      {debugInfo && (
+        <div className="p-4 mb-4 bg-gray-100 text-gray-800 rounded text-xs font-mono whitespace-pre-line">
+          {debugInfo}
         </div>
       )}
       

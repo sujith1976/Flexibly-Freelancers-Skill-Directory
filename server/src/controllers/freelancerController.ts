@@ -19,10 +19,13 @@ export const addFreelancer = async (req: Request, res: Response): Promise<void> 
       return;
     }
     
+    // Normalize skills to lowercase
+    const normalizedSkills = skills.map((skill: string) => skill.trim().toLowerCase());
+    
     const newFreelancer: IFreelancer = new Freelancer({
       name,
       email,
-      skills
+      skills: normalizedSkills
     });
     
     const savedFreelancer = await newFreelancer.save();
@@ -36,6 +39,13 @@ export const addFreelancer = async (req: Request, res: Response): Promise<void> 
 export const getAllFreelancers = async (req: Request, res: Response): Promise<void> => {
   try {
     const freelancers = await Freelancer.find();
+    console.log(`Found ${freelancers.length} total freelancers`);
+    
+    // Debug: Print all freelancers' skills
+    freelancers.forEach(f => {
+      console.log(`Freelancer ${f.name} skills: ${f.skills.join(', ')}`);
+    });
+    
     res.status(200).json(freelancers);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
@@ -55,19 +65,33 @@ export const searchFreelancersBySkills = async (req: Request, res: Response): Pr
     // Handle both string and array formats from the query
     let skillsArray: string[];
     if (typeof skills === 'string') {
-      skillsArray = skills.split(',').map(skill => skill.trim().toLowerCase());
+      skillsArray = [skills.trim().toLowerCase()];
     } else {
-      skillsArray = skills as string[];
+      skillsArray = (skills as string[]).map(skill => skill.trim().toLowerCase());
     }
     
-    // Find freelancers that have ALL of the requested skills (not just any)
-    const freelancers = await Freelancer.find({
-      skills: { $all: skillsArray }
+    console.log('Searching for skills:', skillsArray);
+    
+    // Find all freelancers
+    const allFreelancers = await Freelancer.find();
+    console.log(`Total freelancers in database: ${allFreelancers.length}`);
+    
+    // Manual filtering approach as a fallback
+    const matchingFreelancers = allFreelancers.filter(freelancer => {
+      // Check if freelancer has ALL the required skills (case insensitive)
+      return skillsArray.every(searchSkill => 
+        freelancer.skills.some(freelancerSkill => 
+          freelancerSkill.toLowerCase() === searchSkill.toLowerCase()
+        )
+      );
     });
     
-    res.status(200).json(freelancers);
+    console.log(`Found ${matchingFreelancers.length} freelancers matching ALL skills: ${skillsArray.join(', ')}`);
+    
+    res.status(200).json(matchingFreelancers);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error });
+    console.error('Error searching freelancers by skills:', error);
+    res.status(500).json({ message: 'Server Error', error: String(error) });
   }
 };
 
