@@ -60,9 +60,9 @@ export const searchFreelancersBySkills = async (req: Request, res: Response): Pr
       skillsArray = skills as string[];
     }
     
-    // Find freelancers that have any of the requested skills
+    // Find freelancers that have ALL of the requested skills (not just any)
     const freelancers = await Freelancer.find({
-      skills: { $in: skillsArray }
+      skills: { $all: skillsArray }
     });
     
     res.status(200).json(freelancers);

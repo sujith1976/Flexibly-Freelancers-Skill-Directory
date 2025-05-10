@@ -71,7 +71,7 @@ const SearchFreelancers: React.FC = () => {
           placeholder="Enter skills to search for freelancers"
         />
         <p className="text-sm text-gray-500 mt-1">
-          Add multiple skills to search for freelancers with any of those skills
+          Add multiple skills to search for freelancers that have ALL of these skills
         </p>
       </div>
       
@@ -107,7 +107,7 @@ const SearchFreelancers: React.FC = () => {
         ) : (
           <div className="text-center py-4 text-gray-500">
             {searchSkills.length > 0 
-              ? `No freelancers found with skills: ${searchSkills.join(', ')}`
+              ? `No freelancers found with all these skills: ${searchSkills.join(', ')}`
               : 'No freelancers found. Try adding some first!'}
           </div>
         )}
