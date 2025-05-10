@@ -39,13 +39,6 @@ export const addFreelancer = async (req: Request, res: Response): Promise<void> 
 export const getAllFreelancers = async (req: Request, res: Response): Promise<void> => {
   try {
     const freelancers = await Freelancer.find();
-    console.log(`Found ${freelancers.length} total freelancers`);
-    
-    // Debug: Print all freelancers' skills
-    freelancers.forEach(f => {
-      console.log(`Freelancer ${f.name} skills: ${f.skills.join(', ')}`);
-    });
-    
     res.status(200).json(freelancers);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
@@ -70,11 +63,8 @@ export const searchFreelancersBySkills = async (req: Request, res: Response): Pr
       skillsArray = (skills as string[]).map(skill => skill.trim().toLowerCase());
     }
     
-    console.log('Searching for skills:', skillsArray);
-    
     // Find all freelancers
     const allFreelancers = await Freelancer.find();
-    console.log(`Total freelancers in database: ${allFreelancers.length}`);
     
     // Manual filtering approach as a fallback
     const matchingFreelancers = allFreelancers.filter(freelancer => {
@@ -86,11 +76,8 @@ export const searchFreelancersBySkills = async (req: Request, res: Response): Pr
       );
     });
     
-    console.log(`Found ${matchingFreelancers.length} freelancers matching ALL skills: ${skillsArray.join(', ')}`);
-    
     res.status(200).json(matchingFreelancers);
   } catch (error) {
-    console.error('Error searching freelancers by skills:', error);
     res.status(500).json({ message: 'Server Error', error: String(error) });
   }
 };
