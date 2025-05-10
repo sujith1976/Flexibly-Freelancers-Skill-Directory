@@ -20,10 +20,13 @@ export const defaultFetchOptions: RequestInit = {
 export async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     try {
-      const error = await response.json();
-      throw new Error(error.message || `Error: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Server error: ${response.status}`);
     } catch (e) {
-      // If we can't parse the error as JSON
+      // If we can't parse the error as JSON or another error occurred
+      if (e instanceof Error && e.message !== `Server error: ${response.status}`) {
+        throw e; // Re-throw if it's already a parsed error
+      }
       throw new Error(`Server error: ${response.status}`);
     }
   }

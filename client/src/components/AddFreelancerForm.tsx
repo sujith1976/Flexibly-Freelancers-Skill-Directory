@@ -30,15 +30,32 @@ const AddFreelancerForm: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
-    // Validation
-    if (!formData.name.trim() || !formData.email.trim() || formData.skills.length === 0) {
-      setMessage({ 
-        text: 'All fields are required and at least one skill must be added', 
-        type: 'error' 
-      });
+    // Improved validation
+    if (!formData.name.trim()) {
+      setMessage({ text: 'Name is required', type: 'error' });
+      return;
+    }
+    
+    if (!formData.email.trim()) {
+      setMessage({ text: 'Email is required', type: 'error' });
+      return;
+    }
+    
+    if (!validateEmail(formData.email)) {
+      setMessage({ text: 'Please enter a valid email address', type: 'error' });
+      return;
+    }
+    
+    if (formData.skills.length === 0) {
+      setMessage({ text: 'At least one skill must be added', type: 'error' });
       return;
     }
     
@@ -54,10 +71,17 @@ const AddFreelancerForm: React.FC = () => {
       setFormData({ name: '', email: '', skills: [] });
     } catch (error) {
       console.error('Error adding freelancer:', error);
-      setMessage({ 
-        text: error instanceof Error ? error.message : 'An error occurred while adding the freelancer', 
-        type: 'error' 
-      });
+      if (error instanceof Error && error.message.includes('already exists')) {
+        setMessage({ 
+          text: 'A freelancer with this email already exists',
+          type: 'error' 
+        });
+      } else {
+        setMessage({ 
+          text: error instanceof Error ? error.message : 'An error occurred while adding the freelancer', 
+          type: 'error' 
+        });
+      }
     } finally {
       setIsLoading(false);
     }
