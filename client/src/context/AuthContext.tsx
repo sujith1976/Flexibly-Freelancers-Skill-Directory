@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import { ENDPOINTS } from '@/utils/api';
+import axiosClient from '@/utils/axiosClient';
 
 interface User {
   _id: string;
@@ -19,7 +20,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = 'http://localhost:5000/api/users';
+// Use the API endpoint from the centralized configuration
+const API_URL = ENDPOINTS.users;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -39,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (name: string, email: string, password: string) => {
     try {
       setLoading(true);
-      const response = await axios.post(API_URL, { name, email, password });
+      const response = await axiosClient.post('/api/users', { name, email, password });
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
       setError(null);
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const response = await axios.post(`${API_URL}/login`, { email, password });
+      const response = await axiosClient.post('/api/users/login', { email, password });
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
       setError(null);

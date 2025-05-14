@@ -1,10 +1,11 @@
 // API base URL - ensure it has the correct protocol
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://databaseapp-sable.vercel.app';
 
 // API endpoints
 export const ENDPOINTS = {
   freelancers: `${API_URL}/api/freelancers`,
   freelancerSearch: `${API_URL}/api/freelancers/search`,
+  users: `${API_URL}/api/users`,
 };
 
 // Default fetch options with CORS settings
@@ -55,4 +56,28 @@ export async function apiRequest<T>(
     console.error('API request failed:', error);
     throw error;
   }
+}
+
+// Add auth token to request headers
+export function getAuthHeaders() {
+  let headers = {
+    'Content-Type': 'application/json',
+  };
+  
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      if (user && user.token) {
+        return {
+          ...headers,
+          'Authorization': `Bearer ${user.token}`
+        };
+      }
+    }
+  } catch (error) {
+    console.error('Error accessing auth token:', error);
+  }
+  
+  return headers;
 } 
