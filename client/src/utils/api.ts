@@ -2,7 +2,7 @@
 console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
 
 // API base URL - ensure it has the correct protocol
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://databaseapp-sable.vercel.app';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://databaseapp-qb42.onrender.com';
 
 // Log the actual API URL being used
 console.log('Using API URL:', API_URL);
