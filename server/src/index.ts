@@ -4,6 +4,7 @@ import { PORT } from './config/env';
 import { connectDB } from './config/db';
 import itemRoutes from './routes/itemRoutes';
 import freelancerRoutes from './routes/freelancerRoutes';
+import userRoutes from './routes/userRoutes';
 
 // Initialize express app
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json());
 // Routes
 app.use('/api/items', itemRoutes);
 app.use('/api/freelancers', freelancerRoutes);
+app.use('/api/users', userRoutes);
 
 // Basic route
 app.get('/', (req: Request, res: Response) => {

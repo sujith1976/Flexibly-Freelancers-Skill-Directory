@@ -1,5 +1,5 @@
 // API base URL - ensure it has the correct protocol
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://databaseapp-qb42.onrender.com';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 // API endpoints
 export const ENDPOINTS = {
