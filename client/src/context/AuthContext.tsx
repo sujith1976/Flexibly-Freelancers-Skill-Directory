@@ -41,11 +41,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (name: string, email: string, password: string) => {
     try {
       setLoading(true);
-      const response = await axiosClient.post('/api/users', { name, email, password });
+      setError(null);
+      console.log('Registering user with:', { name, email });
+      
+      // Direct API endpoint without the base URL part 
+      const response = await axiosClient.post('api/users', { name, email, password });
+      
+      console.log('Registration response:', response.data);
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
-      setError(null);
     } catch (error: any) {
+      console.error('Registration error:', error);
       setError(error.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
@@ -56,11 +62,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const response = await axiosClient.post('/api/users/login', { email, password });
+      setError(null);
+      console.log('Logging in with email:', email);
+      
+      // Direct API endpoint without the base URL part
+      const response = await axiosClient.post('api/users/login', { email, password });
+      
+      console.log('Login response:', response.data);
       setUser(response.data);
       localStorage.setItem('user', JSON.stringify(response.data));
-      setError(null);
     } catch (error: any) {
+      console.error('Login error:', error);
       setError(error.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);

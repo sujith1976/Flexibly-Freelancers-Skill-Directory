@@ -1,5 +1,11 @@
+// Log the environment variable value
+console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+
 // API base URL - ensure it has the correct protocol
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://databaseapp-sable.vercel.app';
+
+// Log the actual API URL being used
+console.log('Using API URL:', API_URL);
 
 // API endpoints
 export const ENDPOINTS = {
@@ -7,6 +13,9 @@ export const ENDPOINTS = {
   freelancerSearch: `${API_URL}/api/freelancers/search`,
   users: `${API_URL}/api/users`,
 };
+
+// Log the endpoints for debugging
+console.log('API Endpoints:', ENDPOINTS);
 
 // Default fetch options with CORS settings
 export const defaultFetchOptions: RequestInit = {
@@ -46,6 +55,7 @@ export async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
   try {
+    console.log(`Making API request to: ${url}`, options);
     const response = await fetch(url, {
       ...defaultFetchOptions,
       ...options,
