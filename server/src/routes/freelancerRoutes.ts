@@ -3,7 +3,9 @@ import {
   addFreelancer,
   getAllFreelancers,
   getFreelancer,
-  searchFreelancersBySkills
+  searchFreelancersBySkills,
+  updateFreelancer,
+  deleteFreelancer
 } from '../controllers/freelancerController';
 
 const router = express.Router();
@@ -19,5 +21,11 @@ router.get('/search', searchFreelancersBySkills);
 
 // GET a freelancer by ID
 router.get('/:id', getFreelancer);
+
+// UPDATE a freelancer by ID
+router.put('/:id', updateFreelancer);
+
+// DELETE a freelancer by ID
+router.delete('/:id', deleteFreelancer);
 
 export default router; 

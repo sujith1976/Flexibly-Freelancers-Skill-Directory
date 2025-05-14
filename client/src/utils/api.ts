@@ -11,6 +11,7 @@ console.log('Using API URL:', API_URL);
 export const ENDPOINTS = {
   freelancers: `${API_URL}/api/freelancers`,
   freelancerSearch: `${API_URL}/api/freelancers/search`,
+  freelancerById: (id: string) => `${API_URL}/api/freelancers/${id}`,
   users: `${API_URL}/api/users`,
 };
 

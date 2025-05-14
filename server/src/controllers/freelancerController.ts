@@ -96,4 +96,54 @@ export const getFreelancer = async (req: Request, res: Response): Promise<void> 
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error });
   }
+};
+
+// Update a freelancer
+export const updateFreelancer = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { name, email, skills } = req.body;
+    
+    // Validate required fields
+    if (!name || !email || !skills || skills.length === 0) {
+      res.status(400).json({ message: 'Name, email, and at least one skill are required' });
+      return;
+    }
+    
+    // Normalize skills to lowercase
+    const normalizedSkills = skills.map((skill: string) => skill.trim().toLowerCase());
+    
+    const updatedFreelancer = await Freelancer.findByIdAndUpdate(
+      id,
+      { name, email, skills: normalizedSkills },
+      { new: true }
+    );
+    
+    if (!updatedFreelancer) {
+      res.status(404).json({ message: 'Freelancer not found' });
+      return;
+    }
+    
+    res.status(200).json(updatedFreelancer);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
+};
+
+// Delete a freelancer
+export const deleteFreelancer = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    
+    const deletedFreelancer = await Freelancer.findByIdAndDelete(id);
+    
+    if (!deletedFreelancer) {
+      res.status(404).json({ message: 'Freelancer not found' });
+      return;
+    }
+    
+    res.status(200).json({ message: 'Freelancer deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
 }; 
