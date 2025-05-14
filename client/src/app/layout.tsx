@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import AuthWrapper from '@/context/AuthWrapper';
+import ScrollButtonWrapper from '@/components/ScrollButtonWrapper';
 
 export const metadata: Metadata = {
   title: 'Next.js MongoDB Fullstack App',
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body>
         <AuthWrapper>
           {children}
+          <ScrollButtonWrapper />
         </AuthWrapper>
       </body>
     </html>
