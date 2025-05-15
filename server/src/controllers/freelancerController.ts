@@ -4,7 +4,7 @@ import Freelancer, { IFreelancer } from '../models/Freelancer';
 // Add a new freelancer
 export const addFreelancer = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, skills, description } = req.body;
+    const { name, email, skills, description, location, skillRatings } = req.body;
     
     // Validate required fields
     if (!name || !email || !skills || skills.length === 0) {
@@ -22,11 +22,14 @@ export const addFreelancer = async (req: Request, res: Response): Promise<void> 
     // Normalize skills to lowercase
     const normalizedSkills = skills.map((skill: string) => skill.trim().toLowerCase());
     
+    // Create freelancer object with all fields
     const newFreelancer: IFreelancer = new Freelancer({
       name,
       email,
       skills: normalizedSkills,
-      description
+      description,
+      location: location || '',
+      skillRatings: skillRatings || []
     });
     
     const savedFreelancer = await newFreelancer.save();
@@ -103,7 +106,7 @@ export const getFreelancer = async (req: Request, res: Response): Promise<void> 
 export const updateFreelancer = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, email, skills, description } = req.body;
+    const { name, email, skills, description, location, skillRatings } = req.body;
     
     // Validate required fields
     if (!name || !email || !skills || skills.length === 0) {
@@ -116,7 +119,14 @@ export const updateFreelancer = async (req: Request, res: Response): Promise<voi
     
     const updatedFreelancer = await Freelancer.findByIdAndUpdate(
       id,
-      { name, email, skills: normalizedSkills, description },
+      { 
+        name, 
+        email, 
+        skills: normalizedSkills, 
+        description,
+        location: location || '',
+        ...(skillRatings && { skillRatings })
+      },
       { new: true }
     );
     

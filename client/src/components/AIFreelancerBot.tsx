@@ -28,7 +28,7 @@ const AIFreelancerBot: React.FC<AIFreelancerBotProps> = ({ onSelectFreelancer })
   const [lastQuery, setLastQuery] = useState('');
 
   // Gemini API key
-  const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || 'AIzaSyA2p671B_YDp0R7JDPytQSq7OKYYjjC7F0';
   
   // Scroll to bottom of chat
   const scrollToBottom = () => {

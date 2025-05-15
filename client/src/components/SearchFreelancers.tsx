@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TagInput from './TagInput';
 import { ENDPOINTS, apiRequest } from '@/utils/api';
 import AIFreelancerBot from './AIFreelancerBot';
+
+interface SkillRating {
+  skill: string;
+  rating: number;
+}
 
 interface Freelancer {
   _id: string;
   name: string;
   email: string;
+  location?: string;
   skills: string[];
+  skillRatings?: SkillRating[];
   description?: string;
   createdAt: string;
 }
@@ -210,6 +217,60 @@ const SearchFreelancers: React.FC = () => {
   const DescriptionModal = () => {
     if (!selectedFreelancer || !showModal) return null;
 
+    // State for auto-scrolling
+    const [autoScrollActive, setAutoScrollActive] = useState(false);
+    const [scrollDirection, setScrollDirection] = useState('down');
+    const [scrollSpeed, setScrollSpeed] = useState(1); // 1 = slow, 2 = medium, 3 = fast
+    const descriptionRef = useRef<HTMLDivElement>(null);
+    
+    // Toggle auto-scroll
+    const toggleAutoScroll = () => {
+      setAutoScrollActive(!autoScrollActive);
+    };
+    
+    // Change scroll direction
+    const toggleScrollDirection = () => {
+      setScrollDirection(prev => prev === 'down' ? 'up' : 'down');
+    };
+    
+    // Change scroll speed
+    const changeScrollSpeed = () => {
+      setScrollSpeed(prev => (prev % 3) + 1); // Cycle between 1, 2, 3
+    };
+    
+    // Handle manual scroll controls
+    const scrollContent = (direction: 'up' | 'down') => {
+      if (descriptionRef.current) {
+        const scrollValue = direction === 'down' ? 50 : -50;
+        descriptionRef.current.scrollTop += scrollValue;
+      }
+    };
+    
+    // Effect for auto-scrolling
+    useEffect(() => {
+      if (!autoScrollActive || !descriptionRef.current) return;
+      
+      const scrollAmount = scrollDirection === 'down' ? 1 : -1;
+      const scrollInterval = 4 - scrollSpeed; // Convert speed (1,2,3) to interval (slower is higher)
+      
+      const interval = setInterval(() => {
+        if (descriptionRef.current) {
+          descriptionRef.current.scrollTop += scrollAmount;
+          
+          // Check if we've reached the end or beginning of content
+          const { scrollTop, scrollHeight, clientHeight } = descriptionRef.current;
+          
+          // If at bottom and scrolling down, or at top and scrolling up, stop auto-scroll
+          if ((scrollTop + clientHeight >= scrollHeight && scrollDirection === 'down') || 
+              (scrollTop <= 0 && scrollDirection === 'up')) {
+            setAutoScrollActive(false);
+          }
+        }
+      }, 25 * scrollInterval);
+      
+      return () => clearInterval(interval);
+    }, [autoScrollActive, scrollDirection, scrollSpeed]);
+
     return (
       <div 
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
@@ -233,24 +294,132 @@ const SearchFreelancers: React.FC = () => {
               <p className="font-medium">{selectedFreelancer.email}</p>
             </div>
             
+            {selectedFreelancer.location && (
+              <div className="mb-4">
+                <p className="text-sm text-gray-500">Location</p>
+                <p className="font-medium flex items-center">
+                  <svg className="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  {selectedFreelancer.location}
+                </p>
+              </div>
+            )}
+            
             <div className="mb-4">
               <p className="text-sm text-gray-500">Skills</p>
               <div className="flex flex-wrap gap-1 mt-1">
-                {selectedFreelancer.skills.map((skill, index) => (
-                  <span 
-                    key={index} 
-                    className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full"
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {selectedFreelancer.skills.map((skill, index) => {
+                  // Find skill rating if available
+                  const skillRating = selectedFreelancer.skillRatings?.find(sr => 
+                    sr.skill.toLowerCase() === skill.toLowerCase()
+                  );
+                  
+                  return (
+                    <span 
+                      key={index} 
+                      className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full flex items-center"
+                    >
+                      {skill}
+                      {skillRating && (
+                        <span className="ml-1 flex items-center">
+                          <span className="mx-1 text-gray-400">•</span>
+                          <span className="text-yellow-600 flex items-center">
+                            {skillRating.rating}
+                            <svg 
+                              className="w-3 h-3 ml-0.5 text-yellow-500" 
+                              fill="currentColor" 
+                              viewBox="0 0 20 20" 
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </span>
+                        </span>
+                      )}
+                    </span>
+                  );
+                })}
               </div>
             </div>
             
-            <div>
-              <p className="text-sm text-gray-500">Description</p>
+            <div className="relative">
+              <div className="flex justify-between items-center mb-1">
+                <p className="text-sm text-gray-500">Description</p>
+                
+                {/* Scroll controls */}
+                {selectedFreelancer.description && (
+                  <div className="flex space-x-2">
+                    <button 
+                      onClick={() => scrollContent('up')}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 p-1 rounded"
+                      title="Scroll up"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                      </svg>
+                    </button>
+                    <button 
+                      onClick={() => scrollContent('down')}
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 p-1 rounded"
+                      title="Scroll down"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </button>
+                    <button 
+                      onClick={toggleAutoScroll}
+                      className={`p-1 rounded ${autoScrollActive ? 'bg-blue-200 text-blue-800' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
+                      title={`${autoScrollActive ? 'Stop auto-scroll' : 'Start auto-scroll'}`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                    </button>
+                    
+                    {/* Only show these when auto-scroll is active */}
+                    {autoScrollActive && (
+                      <>
+                        <button 
+                          onClick={toggleScrollDirection}
+                          className="bg-blue-200 text-blue-800 p-1 rounded"
+                          title={`Direction: ${scrollDirection}`}
+                        >
+                          {scrollDirection === 'down' ? (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                            </svg>
+                          )}
+                        </button>
+                        <button 
+                          onClick={changeScrollSpeed}
+                          className="bg-blue-200 text-blue-800 p-1 rounded"
+                          title={`Speed: ${scrollSpeed === 1 ? 'Slow' : scrollSpeed === 2 ? 'Medium' : 'Fast'}`}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                          </svg>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+              
               {selectedFreelancer.description ? (
-                <p className="mt-1 text-gray-700">{selectedFreelancer.description}</p>
+                <div 
+                  ref={descriptionRef}
+                  className="mt-1 text-gray-700 max-h-64 overflow-y-auto pr-2 description-scrollbar border border-gray-100 rounded p-3"
+                >
+                  {selectedFreelancer.description}
+                </div>
               ) : (
                 <p className="mt-1 text-gray-400 italic">No description available</p>
               )}
@@ -325,7 +494,18 @@ const SearchFreelancers: React.FC = () => {
                   >
                     {freelancer.name}
                   </h3>
-                  <p className="text-gray-600">{freelancer.email}</p>
+                  <div className="flex items-center text-gray-600">
+                    <span>{freelancer.email}</span>
+                    {freelancer.location && (
+                      <span className="ml-3 flex items-center text-gray-500 text-sm">
+                        <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        {freelancer.location}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex space-x-2">
                   {editingState.isEditing && editingState.freelancerId === freelancer._id ? (

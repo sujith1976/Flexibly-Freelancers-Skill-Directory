@@ -51,4 +51,23 @@ body {
 
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+/* Description scrollbar styles */
+.description-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.description-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.description-scrollbar::-webkit-scrollbar-thumb {
+  background: #c5d5e9;
+  border-radius: 4px;
+}
+
+.description-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a3b9d8;
 } 
