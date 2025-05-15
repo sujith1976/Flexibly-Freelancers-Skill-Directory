@@ -51,7 +51,7 @@ const ScrollButton: React.FC = () => {
       {showScrollUp && (
         <button
           onClick={scrollToTop}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg transition-all duration-300"
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-xl hover:shadow-2xl transition-all duration-300"
           aria-label="Scroll to top"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,7 +63,7 @@ const ScrollButton: React.FC = () => {
       {!isAtBottom && (
         <button
           onClick={scrollToBottom}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg transition-all duration-300"
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-xl hover:shadow-2xl transition-all duration-300"
           aria-label="Scroll to bottom"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
