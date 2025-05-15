@@ -4,21 +4,23 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import Button from '@/components/Button';
+import DarkModeToggle from '@/components/DarkModeToggle';
 
 export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 dark:text-white">
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          <div className="text-2xl font-bold text-blue-700">Flexibly</div>
+          <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">Flexibly</div>
           <div className="flex items-center space-x-4">
+            <DarkModeToggle />
             <Button 
               onClick={() => router.push('/login')}
               variant="outline"
-              className="shadow-sm"
+              className="shadow-sm dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
               Login
             </Button>
@@ -37,11 +39,11 @@ export default function LandingPage() {
       <section className="container mx-auto px-6 py-16 md:py-24">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-12 md:mb-0">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-6">
               Manage your freelance workforce
-              <span className="text-blue-600"> effortlessly</span>
+              <span className="text-blue-600 dark:text-blue-400"> effortlessly</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
               Streamline hiring, manage talent, and scale your business with our comprehensive freelancer management platform.
             </p>
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
@@ -55,7 +57,7 @@ export default function LandingPage() {
               <Button 
                 onClick={() => router.push('/login')}
                 variant="outline"
-                className="px-8 py-3 text-lg"
+                className="px-8 py-3 text-lg dark:bg-gray-700 dark:text-white dark:border-gray-600"
               >
                 Learn More
               </Button>
@@ -63,12 +65,12 @@ export default function LandingPage() {
           </div>
           <div className="md:w-1/2 flex justify-center">
             <div className="relative w-full max-w-lg h-80 md:h-96">
-              <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-              <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-              <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+              <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 dark:bg-purple-700 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+              <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 dark:bg-yellow-700 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+              <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 dark:bg-pink-700 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
               <div className="relative">
                 {/* Clean workspace image */}
-                <div className="bg-white p-3 rounded-lg shadow-xl transition-all duration-300 hover:shadow-2xl">
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-xl transition-all duration-300 hover:shadow-2xl">
                   <Image 
                     src="/images/simple-workspace.jpg" 
                     alt="Clean workspace with laptop, coffee and croissant" 
@@ -85,48 +87,48 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-white py-16">
+      <section className="bg-white dark:bg-gray-800 py-16">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Why Choose Flexibly?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 dark:text-white">Why Choose Flexibly?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-blue-50 p-6 rounded-lg shadow-md">
+            <div className="bg-blue-50 dark:bg-gray-700 p-6 rounded-lg shadow-md">
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">Add Freelancers Easily</h3>
-              <p className="text-gray-600">Quickly add and categorize freelancers with our intuitive interface.</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Add Freelancers Easily</h3>
+              <p className="text-gray-600 dark:text-gray-300">Quickly add and categorize freelancers with our intuitive interface.</p>
             </div>
             
             {/* Feature 2 */}
-            <div className="bg-blue-50 p-6 rounded-lg shadow-md">
+            <div className="bg-blue-50 dark:bg-gray-700 p-6 rounded-lg shadow-md">
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">Find Talent Quickly</h3>
-              <p className="text-gray-600">Search and filter to find the perfect freelancer for your project needs.</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Find Talent Quickly</h3>
+              <p className="text-gray-600 dark:text-gray-300">Search and filter to find the perfect freelancer for your project needs.</p>
             </div>
             
             {/* Feature 3 */}
-            <div className="bg-blue-50 p-6 rounded-lg shadow-md">
+            <div className="bg-blue-50 dark:bg-gray-700 p-6 rounded-lg shadow-md">
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">Secure Management</h3>
-              <p className="text-gray-600">Manage your freelance workforce with confidence and security.</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Secure Management</h3>
+              <p className="text-gray-600 dark:text-gray-300">Manage your freelance workforce with confidence and security.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-blue-600 py-16">
+      <section className="bg-blue-600 dark:bg-blue-800 py-16">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to transform your freelancer management?</h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
@@ -135,7 +137,7 @@ export default function LandingPage() {
           <Button 
             onClick={() => router.push('/signup')}
             variant="secondary"
-            className="px-8 py-3 text-lg bg-white text-blue-600 hover:bg-gray-100 shadow-xl"
+            className="px-8 py-3 text-lg bg-white text-blue-600 hover:bg-gray-100 dark:bg-gray-200 dark:hover:bg-gray-300 shadow-xl"
           >
             Get Started for Free
           </Button>
@@ -143,7 +145,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12">
+      <footer className="bg-gray-800 dark:bg-gray-900 text-white py-12">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-6 md:mb-0">

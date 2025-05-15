@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import AuthWrapper from '@/context/AuthWrapper';
 import ScrollButtonWrapper from '@/components/ScrollButtonWrapper';
+import { ThemeProvider } from '@/context/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'Next.js MongoDB Fullstack App',
@@ -14,12 +15,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <AuthWrapper>
-          {children}
-          <ScrollButtonWrapper />
-        </AuthWrapper>
+    <html lang="en" className="h-full">
+      <body className="h-full">
+        <ThemeProvider>
+          <AuthWrapper>
+            {children}
+            <ScrollButtonWrapper />
+          </AuthWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );
