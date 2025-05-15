@@ -62,10 +62,8 @@ axiosClient.interceptors.response.use(
       // If token is expired or invalid, clear local storage
       localStorage.removeItem('user');
       
-      // Redirect to login page if not already there
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
+      // Redirect to home page instead of login
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

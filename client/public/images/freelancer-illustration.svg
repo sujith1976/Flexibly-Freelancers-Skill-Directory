@@ -1,0 +1,64 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="400" height="300" fill="#f5f5f5" rx="8" ry="8"/>
+  
+  <!-- Dark desk surface -->
+  <rect x="0" y="200" width="400" height="100" fill="#333333" rx="0" ry="0"/>
+  
+  <!-- Wooden basket tray -->
+  <rect x="230" y="120" width="140" height="100" fill="#8B4513" rx="5" ry="5"/>
+  <rect x="235" y="125" width="130" height="90" fill="#A0522D" rx="3" ry="3"/>
+  <path d="M235 170 h130" stroke="#8B4513" stroke-width="2" fill="none"/>
+  
+  <!-- Coffee cup -->
+  <circle cx="280" cy="155" r="20" fill="#FFFFFF"/>
+  <path d="M260 155 h40" stroke="#FFFFFF" stroke-width="40" stroke-linecap="round"/>
+  <circle cx="280" cy="155" r="18" fill="#3a2517"/>
+  <path d="M273 147 q7 -2 14 0" stroke="#6F4E37" stroke-width="2" fill="none"/>
+  
+  <!-- Croissant on plate -->
+  <circle cx="330" cy="155" r="25" fill="#FFFFFF"/> <!-- Plate -->
+  <path d="M315 155 q15 -15 30 0 q-5 10 -30 0" fill="#F5DEB3" stroke="#DEB887" stroke-width="1"/> <!-- Croissant -->
+  
+  <!-- Laptop -->
+  <g>
+    <!-- Laptop base -->
+    <rect x="80" y="150" width="120" height="80" fill="#333" rx="4" ry="4"/>
+    <!-- Laptop screen -->
+    <rect x="75" y="70" width="130" height="80" fill="#333" rx="4" ry="4"/>
+    <rect x="80" y="75" width="120" height="70" fill="#fff" rx="2" ry="2"/>
+    <!-- Laptop hinge -->
+    <rect x="135" y="150" width="10" height="5" fill="#222"/>
+    <!-- Screen content -->
+    <rect x="90" y="85" width="40" height="5" fill="#333" rx="1" ry="1"/>
+    <rect x="90" y="95" width="100" height="3" fill="#333" rx="1" ry="1"/>
+    <rect x="90" y="105" width="90" height="3" fill="#333" rx="1" ry="1"/>
+    <rect x="90" y="115" width="80" height="3" fill="#333" rx="1" ry="1"/>
+    <rect x="90" y="125" width="70" height="3" fill="#333" rx="1" ry="1"/>
+  </g>
+  
+  <!-- Camera -->
+  <rect x="20" y="110" width="40" height="30" fill="#222" rx="2" ry="2"/>
+  <circle cx="40" cy="125" r="10" fill="#333"/>
+  <circle cx="40" cy="125" r="8" fill="#444"/>
+  <circle cx="40" cy="125" r="5" fill="#222"/>
+  <circle cx="43" cy="122" r="2" fill="#fff" opacity="0.5"/>
+  
+  <!-- Notebook -->
+  <rect x="25" y="150" width="30" height="40" fill="#D2B48C" rx="2" ry="2" transform="rotate(-5 25 150)"/>
+  <path d="M25 155 h30 M25 165 h30 M25 175 h30 M25 185 h30" stroke="#8B4513" stroke-width="1" transform="rotate(-5 25 150)"/>
+  
+  <!-- Small plant -->
+  <rect x="190" y="120" width="20" height="25" fill="#4b5320" rx="2" ry="2"/>
+  <ellipse cx="200" cy="120" rx="15" ry="5" fill="#4b5320"/>
+  <path d="M190 130 q10 -20 20 0 M190 125 q10 -15 20 0 M190 120 q10 -10 20 0" fill="none" stroke="#7CFC00" stroke-width="2"/>
+  
+  <!-- Hands on keyboard -->
+  <path d="M90 200 q20 10 40 0" fill="#e8beac" stroke="#d2957e" stroke-width="1"/>
+  <path d="M140 200 q20 10 40 0" fill="#e8beac" stroke="#d2957e" stroke-width="1"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="370" cy="50" r="20" fill="#fca5a5" opacity="0.6"/>
+  <circle cx="30" cy="30" r="15" fill="#fcd34d" opacity="0.6"/>
+  <path d="M350 260 q20 -20 40 20" fill="none" stroke="#a5b4fc" stroke-width="3" opacity="0.6"/>
+</svg> 

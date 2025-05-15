@@ -6,6 +6,7 @@ interface FormData {
   name: string;
   email: string;
   skills: string[];
+  description: string;
 }
 
 interface FreelancerResponse {
@@ -13,6 +14,7 @@ interface FreelancerResponse {
   name: string;
   email: string;
   skills: string[];
+  description: string;
   createdAt: string;
 }
 
@@ -20,13 +22,22 @@ const AddFreelancerForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
-    skills: []
+    skills: [],
+    description: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [wordCount, setWordCount] = useState(0);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    if (name === 'description') {
+      // Count words in description
+      const words = value.trim() ? value.trim().split(/\s+/).length : 0;
+      setWordCount(words);
+    }
+    
     setFormData({ ...formData, [name]: value });
   };
 
@@ -59,16 +70,28 @@ const AddFreelancerForm: React.FC = () => {
       return;
     }
     
+    if (wordCount > 300) {
+      setMessage({ text: 'Description cannot exceed 300 words', type: 'error' });
+      return;
+    }
+    
     try {
       setIsLoading(true);
       
-      await apiRequest<FreelancerResponse>(ENDPOINTS.freelancers, {
+      // Debug logging to check what's being sent
+      console.log("Submitting freelancer data:", formData);
+      
+      const response = await apiRequest<FreelancerResponse>(ENDPOINTS.freelancers, {
         method: 'POST',
         body: JSON.stringify(formData)
       });
       
+      // Debug logging to check the response
+      console.log("Server response:", response);
+      
       setMessage({ text: 'Freelancer added successfully!', type: 'success' });
-      setFormData({ name: '', email: '', skills: [] });
+      setFormData({ name: '', email: '', skills: [], description: '' });
+      setWordCount(0);
     } catch (error) {
       console.error('Error adding freelancer:', error);
       if (error instanceof Error && error.message.includes('already exists')) {
@@ -155,11 +178,29 @@ const AddFreelancerForm: React.FC = () => {
           </p>
         </div>
         
+        <div className="mb-4">
+          <label htmlFor="description" className="block text-gray-700 font-medium mb-2">
+            Description <span className="font-normal">(up to 300 words)</span>
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            rows={5}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Describe the freelancer's experience, expertise, and background..."
+          />
+          <div className={`text-sm mt-1 flex justify-end ${wordCount > 300 ? 'text-red-500 font-semibold' : 'text-gray-500'}`}>
+            {wordCount}/300 words
+          </div>
+        </div>
+        
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || wordCount > 300}
           className={`w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
-            isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            isLoading || wordCount > 300 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
           {isLoading ? 'Adding...' : 'Add Freelancer'}

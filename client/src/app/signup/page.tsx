@@ -30,7 +30,7 @@ export default function SignupPage() {
 
   const onSubmit = async (data: SignupFormData) => {
     await registerUser(data.name, data.email, data.password);
-    router.push('/');
+    router.push('/dashboard');
   };
 
   return (

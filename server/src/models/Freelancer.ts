@@ -4,6 +4,7 @@ export interface IFreelancer extends Document {
   name: string;
   email: string;
   skills: string[];
+  description: string;
   createdAt: Date;
 }
 
@@ -32,6 +33,19 @@ const FreelancerSchema: Schema = new Schema({
     set: function(skills: string[]) {
       // Normalize all skills to lowercase and trimmed
       return skills.map(skill => skill.trim().toLowerCase());
+    }
+  },
+  description: {
+    type: String,
+    trim: true,
+    maxlength: 2000, // Approximately 300 words
+    validate: {
+      validator: function(text: string) {
+        // Count words by splitting on whitespace
+        const wordCount = text ? text.trim().split(/\s+/).length : 0;
+        return wordCount <= 300;
+      },
+      message: 'Description cannot exceed 300 words'
     }
   },
   createdAt: {

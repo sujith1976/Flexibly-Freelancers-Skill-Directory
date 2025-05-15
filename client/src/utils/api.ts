@@ -57,10 +57,18 @@ export async function apiRequest<T>(
 ): Promise<T> {
   try {
     console.log(`Making API request to: ${url}`, options);
+    
+    // Log request body if it exists
+    if (options.body) {
+      console.log('Request body:', options.body);
+    }
+    
     const response = await fetch(url, {
       ...defaultFetchOptions,
       ...options,
     });
+    
+    console.log(`Response status: ${response.status}`);
     
     return await handleApiResponse<T>(response);
   } catch (error) {

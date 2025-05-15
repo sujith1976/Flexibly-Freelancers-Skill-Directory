@@ -4,7 +4,7 @@ import Freelancer, { IFreelancer } from '../models/Freelancer';
 // Add a new freelancer
 export const addFreelancer = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, skills } = req.body;
+    const { name, email, skills, description } = req.body;
     
     // Validate required fields
     if (!name || !email || !skills || skills.length === 0) {
@@ -25,7 +25,8 @@ export const addFreelancer = async (req: Request, res: Response): Promise<void> 
     const newFreelancer: IFreelancer = new Freelancer({
       name,
       email,
-      skills: normalizedSkills
+      skills: normalizedSkills,
+      description
     });
     
     const savedFreelancer = await newFreelancer.save();
@@ -102,7 +103,7 @@ export const getFreelancer = async (req: Request, res: Response): Promise<void> 
 export const updateFreelancer = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, email, skills } = req.body;
+    const { name, email, skills, description } = req.body;
     
     // Validate required fields
     if (!name || !email || !skills || skills.length === 0) {
@@ -115,7 +116,7 @@ export const updateFreelancer = async (req: Request, res: Response): Promise<voi
     
     const updatedFreelancer = await Freelancer.findByIdAndUpdate(
       id,
-      { name, email, skills: normalizedSkills },
+      { name, email, skills: normalizedSkills, description },
       { new: true }
     );
     
