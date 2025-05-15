@@ -39,13 +39,20 @@ const AIFreelancerBot: React.FC<AIFreelancerBotProps> = ({ onSelectFreelancer })
   const findMatchingFreelancers = (userQuery: string, allFreelancers: Freelancer[]): Freelancer[] => {
     console.log("Using direct keyword matching for: ", userQuery);
     
-    // Break query into keywords
+    // Break query into keywords and key phrases
     const keywords = userQuery.toLowerCase()
       .replace(/[^\w\s]/g, '') // Remove punctuation
       .split(/\s+/)
-      .filter(word => word.length > 2 && !['and', 'the', 'for', 'with'].includes(word));
+      .filter(word => word.length > 2 && !['and', 'the', 'for', 'with', 'who', 'can', 'has', 'have', 'need'].includes(word));
+    
+    // Extract possible 2-word phrases for more accurate matching
+    const phrases: string[] = [];
+    for (let i = 0; i < keywords.length - 1; i++) {
+      phrases.push(`${keywords[i]} ${keywords[i + 1]}`);
+    }
     
     console.log("Keywords extracted:", keywords);
+    console.log("Phrases extracted:", phrases);
     
     if (keywords.length === 0) return [];
     
@@ -67,11 +74,40 @@ const AIFreelancerBot: React.FC<AIFreelancerBotProps> = ({ onSelectFreelancer })
           }
         }
         
-        // Check description
+        // Check description with increased weight
         if (descriptionText.includes(keyword)) {
-          score += 3;
+          score += 4; // Increased from 3 to 4
+          
+          // Bonus for keywords appearing near the beginning of the description
+          // This often indicates more relevance
+          if (descriptionText.indexOf(keyword) < 100) {
+            score += 1;
+          }
+          
+          // Bonus for multiple occurrences of the keyword in description
+          const occurrences = (descriptionText.match(new RegExp(keyword, 'g')) || []).length;
+          if (occurrences > 1) {
+            score += Math.min(occurrences - 1, 3); // Up to 3 bonus points for repeated keywords
+          }
         }
       });
+      
+      // Check for phrase matches which are stronger indicators of relevance
+      phrases.forEach(phrase => {
+        if (skillText.includes(phrase)) {
+          score += 4; // Extra points for matching phrases in skills
+        }
+        
+        if (descriptionText.includes(phrase)) {
+          score += 5; // Even more points for matching phrases in description
+        }
+      });
+      
+      // Extra points if has both skill and description matches
+      if (keywords.some(keyword => skillText.includes(keyword)) && 
+          keywords.some(keyword => descriptionText.includes(keyword))) {
+        score += 5; // Bonus for matching both skill and description
+      }
       
       return { freelancer, score };
     });
@@ -104,11 +140,11 @@ const AIFreelancerBot: React.FC<AIFreelancerBotProps> = ({ onSelectFreelancer })
         name: f.name,
         skills: f.skills,
         hasDescription: !!f.description,
-        // Include a short description snippet if available
-        descriptionSnippet: f.description ? f.description.substring(0, 100) + '...' : 'No description'
+        // Include more of the description for better analysis
+        description: f.description ? f.description : 'No description available'
       }));
       
-      // Simpler, more direct prompt
+      // Enhanced prompt with clearer instructions about analyzing both skills and descriptions
       const prompt = `
       Task: Find the best freelancers for this request: "${userQuery}"
 
@@ -116,9 +152,12 @@ const AIFreelancerBot: React.FC<AIFreelancerBotProps> = ({ onSelectFreelancer })
       ${JSON.stringify(simplifiedFreelancers, null, 2)}
 
       Instructions:
-      1. Compare the user's request with each freelancer's skills and description
-      2. Return ONLY a valid JSON array containing IDs of the top 3-5 matching freelancers
-      3. Format must be exactly: ["id1", "id2", "id3"]
+      1. Thoroughly analyze BOTH the skills list AND the full description of each freelancer
+      2. Look for direct matches and also conceptually related skills/experience in the descriptions
+      3. Pay special attention to experience details mentioned in descriptions that might not be listed in skills
+      4. Consider both explicit skill matches and implicit expertise suggested in descriptions
+      5. Return ONLY a valid JSON array containing IDs of the top 3-5 best matching freelancers
+      6. Format must be exactly: ["id1", "id2", "id3"]
       
       Respond with ONLY the JSON array, nothing else.
       `;
@@ -220,38 +259,62 @@ const AIFreelancerBot: React.FC<AIFreelancerBotProps> = ({ onSelectFreelancer })
     const queryTerms = query.toLowerCase()
       .replace(/[^\w\s]/g, '')
       .split(/\s+/)
-      .filter(word => word.length > 2 && !['and', 'the', 'for', 'with', 'who', 'can'].includes(word));
+      .filter(word => word.length > 2 && !['and', 'the', 'for', 'with', 'who', 'can', 'has', 'have', 'need'].includes(word));
     
     // Find matching skills
     const matchingSkills = freelancer.skills.filter(skill => 
       queryTerms.some(term => skill.toLowerCase().includes(term))
     );
     
-    // Find relevant part of description if it exists
+    // Extract 2-word phrases for better context matching
+    const phrases: string[] = [];
+    for (let i = 0; i < queryTerms.length - 1; i++) {
+      phrases.push(`${queryTerms[i]} ${queryTerms[i + 1]}`);
+    }
+    
+    // Find relevant parts of description if it exists
     let relevantDescription = '';
+    let relevantDescriptions: string[] = [];
+    
     if (freelancer.description) {
       const description = freelancer.description.toLowerCase();
       
-      // Try to find a sentence containing one of the query terms
+      // Try to find sentences containing query terms
       const sentences = freelancer.description.split(/[.!?]+/).filter(s => s.trim());
       
+      // Check for sentences with query terms
       for (const sentence of sentences) {
-        if (queryTerms.some(term => sentence.toLowerCase().includes(term))) {
-          relevantDescription = sentence.trim();
-          break;
+        const lowerSentence = sentence.toLowerCase();
+        
+        // Higher priority: Check for phrase matches first
+        if (phrases.some(phrase => lowerSentence.includes(phrase))) {
+          relevantDescriptions.push(sentence.trim());
+          continue;
+        }
+        
+        // Then check for single term matches
+        if (queryTerms.some(term => lowerSentence.includes(term))) {
+          relevantDescriptions.push(sentence.trim());
         }
       }
       
-      // If no sentence found, just use the first part of description
-      if (!relevantDescription) {
-        relevantDescription = freelancer.description.substring(0, 100) + '...';
+      // If we found relevant sentences, join them
+      if (relevantDescriptions.length > 0) {
+        // Keep it to a reasonable length (max 2-3 sentences)
+        relevantDescription = relevantDescriptions.slice(0, 2).join(". ") + (
+          relevantDescriptions.length > 2 ? "..." : ""
+        );
+      } else {
+        // If no direct matches, just use the first part of description
+        relevantDescription = freelancer.description.substring(0, 120) + '...';
       }
     }
     
     return {
       matchingSkills,
       relevantDescription,
-      hasMatchingSkills: matchingSkills.length > 0
+      hasMatchingSkills: matchingSkills.length > 0,
+      hasRelevantDescription: relevantDescriptions.length > 0
     };
   };
 
@@ -403,7 +466,7 @@ const AIFreelancerBot: React.FC<AIFreelancerBotProps> = ({ onSelectFreelancer })
               <div className="space-y-2">
                 {freelancers.map((freelancer) => {
                   // Get match information for this freelancer
-                  const { matchingSkills, relevantDescription, hasMatchingSkills } = getMatchInfo(freelancer, lastQuery);
+                  const { matchingSkills, relevantDescription, hasMatchingSkills, hasRelevantDescription } = getMatchInfo(freelancer, lastQuery);
                   
                   return (
                     <div 
@@ -425,18 +488,18 @@ const AIFreelancerBot: React.FC<AIFreelancerBotProps> = ({ onSelectFreelancer })
                         ))}
                       </div>
                       
-                      {relevantDescription && (
+                      {hasRelevantDescription && (
                         <div className="text-xs text-gray-600 mt-1 border-l-2 border-blue-300 pl-2">
                           <span className="font-medium">Relevant experience: </span>
                           {relevantDescription}
                         </div>
                       )}
                       
-                      {!hasMatchingSkills && freelancer.description && !relevantDescription && (
+                      {!hasRelevantDescription && freelancer.description && (
                         <div className="text-xs text-gray-600 mt-1">
                           <span className="font-medium">Description: </span>
-                          {freelancer.description.length > 80 
-                            ? `${freelancer.description.substring(0, 80)}...` 
+                          {freelancer.description.length > 100 
+                            ? `${freelancer.description.substring(0, 100)}...` 
                             : freelancer.description}
                         </div>
                       )}
